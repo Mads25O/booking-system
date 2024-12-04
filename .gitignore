@@ -1,0 +1,6 @@
+__pycache__/
+.book_env/
+flask_session/
+website/__pycache__/
+instance/
+ideas
