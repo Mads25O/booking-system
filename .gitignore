@@ -3,4 +3,5 @@ __pycache__/
 flask_session/
 website/__pycache__/
 instance/
+.lp_book/
 ideas
