@@ -42,7 +42,8 @@ def patient_login():
     password_form = request.form.get("password")
 
     cpr_exists, patient = check_cpr_exists(cpr_number_form)
-    if cpr_exists != False:
+    print(patient)
+    if cpr_exists != False and patient != None:
         hashed_password, _ = generate_hash(password_form, patient.password_salt)
         if hashed_password == patient.hashed_password:
             login_user(patient, remember=True)
