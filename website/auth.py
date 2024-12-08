@@ -65,10 +65,8 @@ def doctor_login():
     
     email_form = request.form.get("email_name")
     password_form = request.form.get("password_name")
-    print(password_form)
 
     email_exists, doctor = check_email_exists(email_form, 'doctor')
-    print(doctor.password_salt)
     if email_exists:
         hashed_password, _ = generate_hash(password_form, doctor.password_salt)
         if hashed_password == doctor.hashed_password:
