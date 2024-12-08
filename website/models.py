@@ -6,19 +6,26 @@ class Patient(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(150))
     last_name = db.Column(db.String(150))
-    hashed_cpr_number = db.Column(db.String(64), unique=True)
+    hashed_cpr_number = db.Column(db.String(64))
     cpr_salt = db.Column(db.String(32))
     hashed_password = db.Column(db.String(128))
     password_salt = db.Column(db.String(32))
     phone = db.Column(db.Integer)
     email = db.Column(db.String(150), unique=True)
 
+    # Flask automatisk returnere id, men fordi der er to typer users i dette system, skal funktionen selv defineres.
+    def get_id(self):
+        return f'patient:{self.id}'
+
 
 class Doctor(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(150))
     last_name = db.Column(db.String(150))
-    password = db.Column(db.String(150))
+    hashed_password = db.Column(db.String(128))
     password_salt = db.Column(db.String(32))
     phone = db.Column(db.Integer)
     email = db.Column(db.String(150), unique=True)
+    
+    def get_id(self):
+        return f'doctor:{self.id}'

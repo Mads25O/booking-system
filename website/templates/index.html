@@ -1,4 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}Home{% endblock %}
 
-<h1>heyyyyy</h1>
+{% block content %}
+<form action="" method="POST" class="pe-2">
+    <button type="submit" class="btn btn-primary align-center" name="patient_button"
+        value="patient_button">Patient login</button>
+
+    <button type="submit" class="btn btn-danger align-center" name="doctor_button"
+        value="doctor_button">Læge login</button>
+</form>
+{% endblock %}

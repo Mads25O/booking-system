@@ -29,11 +29,19 @@ def create_app():
         db.create_all()
     
     login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = 'auth.patient_login'
     login_manager.init_app(app)
 
+
     @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(int(id))
+    def load_user(id_with_prefix):
+        user_type, id = id_with_prefix.split(":")
+        id = int(id)
+
+        if user_type == 'patient':
+            return Patient.query.get(int(id))
+        elif user_type == 'doctor':
+            return Doctor.query.get(int(id))
+        return None
 
     return app

@@ -52,36 +52,38 @@
                     <a class="nav-link" aria-current="page" href="{{ url_for('views.home') }}">Hjem</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.patient_login') }}">Login</a>
+                    <a class="nav-link" href="{{ url_for('auth.patient_login') }}">Patient Login</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.patient_register') }}">Registrer</a>
+                    <a class="nav-link" href="{{ url_for('auth.patient_register') }}">Patient Registrer</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.doctor_login') }}">Læge Login</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.doctor_register') }}">Læge Registrer</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.logout') }}">Log ud</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('views.logged') }}">Logged</a>
                   </li>
                 </ul>
               </div>
             </div>
           </nav>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-          {% if category == 'error' %}
-          <div class="alert alert-danger alert-dismissable fade show">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          {% else %}
-          <div class="alert alert-success alert-dismissable fade show">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
           {% endif %}
-          {% endfor %}
-        {% endif %}
-        {% endwith %}
+          {% endwith %}
+        
         <div class="container">
           {% block content %}{% endblock %}
         </div>
