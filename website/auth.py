@@ -42,14 +42,15 @@ def patient_login():
     password_form = request.form.get("password")
 
     cpr_exists, patient = check_cpr_exists(cpr_number_form)
-    print(patient)
     if cpr_exists != False and patient != None:
         hashed_password, _ = generate_hash(password_form, patient.password_salt)
         if hashed_password == patient.hashed_password:
             login_user(patient, remember=True)
 
             session["user"] = f'patient:{patient.id}'
-            return redirect(url_for("views.logged"))
+            session["user_type"] = f'patient'
+
+            return redirect(url_for("views.patient_home"))
         else:
             flash('Forkert kode', category='error')
     else:
@@ -73,6 +74,7 @@ def doctor_login():
             login_user(doctor, remember=True)
 
             session["user"] = f'doctor:{doctor.id}'
+            session["user_type"] = 'patient'
             return redirect(url_for("views.logged"))
         else:
             flash('Forkert kode', category='error')
@@ -137,8 +139,11 @@ def patient_register():
         db.session.commit()
         login_user(new_patient, remember=True)
 
+        session["user"] = f'patient:{new_patient.id}'
+        session["user_type"] = f'patient'
+
         flash('Bruger lavet!', category='success')
-        return redirect(url_for('views.logged'))
+        return redirect(url_for('views.patient_home'))
 
     return render_template('patient-register.html')
 
@@ -186,6 +191,9 @@ def doctor_register():
         db.session.add(new_doctor)
         db.session.commit()
         login_user(new_doctor, remember=True)
+
+        session["user"] = f'doctor:{new_doctor.id}'
+        session["user_type"] = f'doctor'
 
         flash('Læge bruger lavet!', category='success')
         return redirect(url_for('views.logged'))

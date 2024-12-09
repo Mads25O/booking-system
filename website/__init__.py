@@ -35,9 +35,15 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(id_with_prefix):
-        user_type, id = id_with_prefix.split(":")
-        id = int(id)
-
+        if not id_with_prefix or ':' not in id_with_prefix:
+            return None
+        
+        try:
+            user_type, id = id_with_prefix.split(":")
+            id = int(id)
+        except ValueError:
+            return None
+        
         if user_type == 'patient':
             return Patient.query.get(int(id))
         elif user_type == 'doctor':

@@ -12,6 +12,7 @@ class Patient(db.Model, UserMixin):
     password_salt = db.Column(db.String(32))
     phone = db.Column(db.Integer)
     email = db.Column(db.String(150), unique=True)
+    bookings = db.Column(db.JSON, default=list)
 
     # Flask automatisk returnere id, men fordi der er to typer users i dette system, skal funktionen selv defineres.
     def get_id(self):
