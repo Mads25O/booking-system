@@ -33,63 +33,64 @@ def check_email_exists(email, user_type):
     return False, None
 
 
-@auth.route("/login", methods=["POST", "GET"])
-def patient_login():
+@auth.route('/', methods=['POST', 'GET'])
+def home():
+    session['user_type'] = None
+    user_type = session['user_type']
+
     if request.method != 'POST':
-        return render_template('patient-login.html')
+        return render_template('index.html', user=current_user, user_type=user_type)
     
-    cpr_number_form = request.form.get("cpr_number")
-    password_form = request.form.get("password")
+    if request.form.get('patient_login'):
+        cpr_number_form = request.form.get("cpr_number")
+        password_form = request.form.get("password")
 
-    cpr_exists, patient = check_cpr_exists(cpr_number_form)
-    if cpr_exists != False and patient != None:
-        hashed_password, _ = generate_hash(password_form, patient.password_salt)
-        if hashed_password == patient.hashed_password:
-            login_user(patient, remember=True)
+        cpr_exists, patient = check_cpr_exists(cpr_number_form)
+        if cpr_exists != False and patient != None:
+            hashed_password, _ = generate_hash(password_form, patient.password_salt)
+            if hashed_password == patient.hashed_password:
+                login_user(patient, remember=True)
 
-            session["user"] = f'patient:{patient.id}'
-            session["user_type"] = f'patient'
+                session["user"] = f'patient:{patient.id}'
+                session["user_type"] = f'patient'
 
-            return redirect(url_for("views.patient_home"))
+                return redirect(url_for("views.patient_home"))
+            else:
+                flash('Forkert kode', category='error')
         else:
-            flash('Forkert kode', category='error')
-    else:
-        flash('CPR er ikke i systemet', category='error')
-    
-    return render_template('patient-login.html')
+            flash('CPR er ikke i systemet', category='error')
 
-    
-@auth.route("/læge-login", methods=["POST", "GET"])
-def doctor_login():
-    if request.method != 'POST':
-        return render_template('doctor-login.html')
-    
-    email_form = request.form.get("email_name")
-    password_form = request.form.get("password_name")
+    elif request.form.get('doctor_login'):
+        email_form = request.form.get("email_name")
+        password_form = request.form.get("password_name")
 
-    email_exists, doctor = check_email_exists(email_form, 'doctor')
-    if email_exists:
-        hashed_password, _ = generate_hash(password_form, doctor.password_salt)
-        if hashed_password == doctor.hashed_password:
-            login_user(doctor, remember=True)
+        email_exists, doctor = check_email_exists(email_form, 'doctor')
+        if email_exists:
+            hashed_password, _ = generate_hash(password_form, doctor.password_salt)
+            if hashed_password == doctor.hashed_password:
+                login_user(doctor, remember=True)
 
-            session["user"] = f'doctor:{doctor.id}'
-            session["user_type"] = 'patient'
-            return redirect(url_for("views.logged"))
+                session["user"] = f'doctor:{doctor.id}'
+                session["user_type"] = 'doctor'
+                return redirect(url_for("views.all_bookings"))
+            else:
+                flash('Forkert kode', category='error')
         else:
-            flash('Forkert kode', category='error')
-    else:
-        flash('E-mail ikke i systemet', category='error')
-   
-    
-    return render_template('doctor-login.html')
-        
+            flash('E-mail ikke i systemet', category='error')
 
+    
+
+    return render_template('index.html', user=current_user, user_type=user_type)
 
 @auth.route("/lav-bruger", methods=["POST", "GET"])
 def patient_register():
+    if session['user_type']:
+        user_type = session["user_type"]
+    else:
+        user_type = None
+
     if request.method != 'POST':
-        return render_template('patient-register.html')
+        return render_template('patient-register.html', user=current_user, user_type=user_type)
     
     cpr_number_form = request.form.get('cpr_number_name')
     first_name_form = request.form.get('first_name_name')
@@ -145,12 +146,17 @@ def patient_register():
         flash('Bruger lavet!', category='success')
         return redirect(url_for('views.patient_home'))
 
-    return render_template('patient-register.html')
+    return render_template('patient-register.html', user=current_user, user_type=user_type)
 
 @auth.route("/læge-lav-bruger", methods=["POST", "GET"])
 def doctor_register():
+    if session['user_type']:
+        user_type = session["user_type"]
+    else:
+        user_type = None
+    
     if request.method != 'POST':
-        return render_template('doctor-register.html')
+        return render_template('doctor-register.html', user=current_user, user_type=user_type)
     
     first_name_form = request.form.get('first_name_name')
     last_name_form = request.form.get('last_name_name')
@@ -196,9 +202,9 @@ def doctor_register():
         session["user_type"] = f'doctor'
 
         flash('Læge bruger lavet!', category='success')
-        return redirect(url_for('views.logged'))
+        return redirect(url_for('views.all_bookings'))
 
-    return render_template('doctor-register.html')
+    return render_template('doctor-register.html', user_type=user_type)
 
 
 
@@ -206,4 +212,5 @@ def doctor_register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('views.home'))
+    flash('Logget ud!', category='success')
+    return redirect(url_for('auth.home'))
