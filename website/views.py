@@ -2,94 +2,105 @@ from flask import Flask, Blueprint, render_template, request, redirect, url_for,
 from flask_login import login_required, current_user
 from datetime import datetime
 from . import db
-from .models import Patient
+from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
 
 
 views = Blueprint('views', __name__)
 
 @views.route("/", methods=["POST", "GET"])
 def home():
-    if request.method != 'POST':
-        return render_template('index.html')
-    
-    if request.form.get('patient_button'):
-        return redirect(url_for('auth.patient_login'))
-    elif request.form.get('doctor_button'):
-        return redirect(url_for('auth.doctor_login'))
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
 
-    return render_template('index.html')
+    return render_template('index.html', user=current_user)
 
-@views.route('/logged')
-@login_required
-def logged():
-    return render_template('logged-in.html')
-
-@views.route('/patient-side', methods = ['POST', 'GET'])
-@login_required
-def patient_home():
-    if request.method != 'POST':
-        return render_template('patient-side.html')
-    
-    if request.form.get('billeddiagnostik'):
-        return redirect(url_for('views.booking'))
-
-    return render_template('patient-side.html')
 
 @views.route('/booking', methods = ['POST', 'GET'])
 @login_required
 def booking():
+    if session['user_type']:
+        user_type = session["user_type"]
+    else:
+        user_type = None
+
     if request.method != 'POST':
-        return render_template('booking.html')
+        return render_template('booking.html', user=current_user, user_type=user_type)
     
     user_id = session.get("user").split(':')[1]
-    print(user_id)
     patient = Patient.query.get(user_id)
+    bookings = Bookings.query.filter_by(user_id=user_id).all()
 
     if not patient:
         flash('Bruger ikke fundet', category='error')
-        return redirect(url_for('auth.patient_login'))
+        return redirect(url_for('auth.login'))
 
     booking_date = request.form.get('date')
     booking_time = request.form.get('time')
 
     new_booking = {
+        'user_id': user_id,
         'date': booking_date,
         'time': booking_time,
         'created_at': datetime.now().isoformat()
     }
 
-    user_bookings = patient.bookings or []
-    user_bookings.append(new_booking)
-    patient.bookings = user_bookings
+    bookings.bookings = bookings.bookings or []
+    bookings.bookings.append(new_booking)
 
-    db.session.commit()
+    try:
+        db.session.add(bookings)
+        db.session.commit()
+        flash('Booking oprettet!', category='success')
+    except Exception as e:
+        flash(f'Fejl {e}')
     
-    flash('Booking oprettet!', category='success')
 
-    return render_template('booking.html')
+    return render_template('booking.html', user=current_user, user_type=user_type)
 
 @views.route('/patient-bookings', methods=['POST','GET'])
 @login_required
 def all_bookings():
+    if session['user_type']:
+        user_type = session["user_type"]
+    else:
+        user_type = None
+
+    patients = Patient.query.all()
+
+    patients_with_bookings = [
+        {
+            'id': patient.id,
+            'first_name': patient.first_name,
+            'last_name': patient.last_name,
+            'bookings': sorted(
+                patient.bookings,
+                key=lambda b: datetime.strptime(f"{b['date']} {b['time']}", "%Y-%m-%d %H:%M")
+            )
+        }
+        for patient in patients if patient.bookings
+    ]
     if session["user_type"] != 'doctor':
         flash('Kun læger har adgang til dette', category='error')
-        return redirect(url_for('views.patient_home'))
+        return redirect(url_for('views.home'))
     
     if request.method != 'POST':
-        print(session["user_type"])
-        print(type(session["user_type"]))
-        return render_template('all-bookings.html')
+        return render_template('all-bookings.html', user=current_user, user_type=user_type, patients=patients_with_bookings)
     
-    return render_template('all-bookings.html')
+    return render_template('all-bookings.html', user=current_user, user_type=user_type, patients=patients_with_bookings)
 
 @views.route('/patient-bookings/<int:patient_id>')
 @login_required
 def patient_bookings(patient_id):
+    if session['user_type']:
+        user_type = session["user_type"]
+    else:
+        user_type = None
+
     if session["user_type"] != 'doctor':
         flash('Kun læger har adgang til dette', category='error')
-        return redirect(url_for('views.patient_home'))
-    
-    if request.method != 'POST':
-        return render_template('patient-bookings.html')
+        return redirect(url_for('views.home'))
 
-    return render_template('patient-bookings.html')
+    if request.method != 'POST':
+        return render_template('patient-bookings.html', user=current_user, user_type=user_type)
+
+    return render_template('patient-bookings.html', user=current_user,)

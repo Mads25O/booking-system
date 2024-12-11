@@ -1,32 +1,39 @@
 from . import db
 from flask_login import UserMixin
-from sqlalchemy.sql import func
 
-class Patient(db.Model, UserMixin):
+class User(db.Model, UserMixin):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(150))
     last_name = db.Column(db.String(150))
-    hashed_cpr_number = db.Column(db.String(64))
+    hashed_password = db.Column(db.String(128))
+    password_salt = db.Column(db.String(32))
+    role = db.Column(db.String(10))
+    phone = db.Column(db.Integer)
+
+    def is_patient(self):
+        return self.role == 'patient'
+
+    def is_doctor(self):
+        return self.role == 'doctor'
+
+class PatientSpecificData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    hashed_cpr = db.Column(db.String(64))
     cpr_salt = db.Column(db.String(32))
-    hashed_password = db.Column(db.String(128))
-    password_salt = db.Column(db.String(32))
-    phone = db.Column(db.Integer)
     email = db.Column(db.String(150), unique=True)
-    bookings = db.Column(db.JSON, default=list)
+    bookings = db.relationship('Bookings', backref='patient')
 
-    # Flask automatisk returnere id, men fordi der er to typer users i dette system, skal funktionen selv defineres.
-    def get_id(self):
-        return f'patient:{self.id}'
-
-
-class Doctor(db.Model, UserMixin):
+class DoctorSpecificData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(150))
-    last_name = db.Column(db.String(150))
-    hashed_password = db.Column(db.String(128))
-    password_salt = db.Column(db.String(32))
-    phone = db.Column(db.Integer)
-    email = db.Column(db.String(150), unique=True)
-    
-    def get_id(self):
-        return f'doctor:{self.id}'
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    username = db.Column(db.String(16))
+
+class Bookings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient_specific_data.id'))
+    date = db.Column(db.String(100))
+    time = db.Column(db.String(100))
+    created_at = db.Column(db.String(100))

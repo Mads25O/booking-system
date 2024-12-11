@@ -1,12 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}Home{% endblock %}
-
 {% block content %}
-<form action="" method="POST" class="pe-2">
-    <button type="submit" class="btn btn-primary align-center" name="patient_button"
-        value="patient_button">Patient login</button>
+{% if user_type == 'patient' %}
+<h1>Velkommen til Hospital</h1>
+<h3>Du kan bestille tid til {{ user_message if user_message != None else 'ingenting' }}</h3>
+{% else %}
 
-    <button type="submit" class="btn btn-danger align-center" name="doctor_button"
-        value="doctor_button">Læge login</button>
-</form>
+{% endif %}
 {% endblock %}

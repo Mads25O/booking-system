@@ -1,4 +1,51 @@
 {% extends 'base.html' %}
 {% block content %}
+<div>
+    <!-- {% if patients %}
+    {% for patient in patients %}
+        <h3>Patient: {{ patient['first_name'] }}</h3>
+        <ul>
+        {% for booking in patient['bookings'] %}
+            <li>
+            Dato: {{ booking['date'] }}, Tid: {{ booking['time'] }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+    {% else %}
+    <p>Ingen bookinger fundet.</p>
+    {% endif %} -->
+    <!-- <h2>Alle patienters bookinger</h2>
+    {% if patients %}
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Dato</th>
+                    <th>Tid</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                    
+                    <tr>
+                        <td>{{ patient.first_name }}</td>
+                        {% for booking in patient['bookings'] %}
+                            {% if loop.index > 1 %}
+                            <tr>
+                            {% endif %}
+                                <td>{{ booking.date }}</td>
+                                <td>{{ booking.time }}</td>
+                            </tr>
+                        {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Der er ingen bookinger at vise.</p>
+    {% endif %}
+</div> -->
+
+
 
 {% endblock %}

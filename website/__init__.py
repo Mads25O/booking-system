@@ -23,31 +23,19 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .models import Patient, Doctor
+    from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
 
     with app.app_context():
         db.create_all()
     
     login_manager = LoginManager()
-    login_manager.login_view = 'views.home'
+    login_manager.login_view = 'auth.home'
     login_manager.init_app(app)
 
 
     @login_manager.user_loader
-    def load_user(id_with_prefix):
-        if not id_with_prefix or ':' not in id_with_prefix:
-            return None
-        
-        try:
-            user_type, id = id_with_prefix.split(":")
-            id = int(id)
-        except ValueError:
-            return None
-        
-        if user_type == 'patient':
-            return Patient.query.get(int(id))
-        elif user_type == 'doctor':
-            return Doctor.query.get(int(id))
-        return None
+    def load_user(user_id):
+        user = User.query.get(int(user_id))
+        return user
 
     return app

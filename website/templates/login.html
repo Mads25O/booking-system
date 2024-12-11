@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="login-div text-center">
+    <div class="row justify-content-md-center">
+        <div class="col col-lg-2">
+            <form method="POST" class="patient_login">
+                <h3 align="center" class="fw-bold">Patient Login</h3>
+                <div class="mb-3">
+                    <label for="cpr_number">CPR-Nummer</label>
+                    <input type="cpr_number" name="cpr_number" id="cpr_number" class="form-control" placeholder="Tast dit CPR nummer ind">
+                </div>  
+                <div class="mb-3">
+                    <label for="password">Adgangskode</label>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Adgangskode">
+                </div>
+                <button type="submit" class="btn btn-primary" name="patient_login" value="patient_login">Login</button>
+            </form>
+        </div>
+        <div class="col col-lg-2">
+            <form method="POST" class="doctor_login">
+                <h3 align="center" class="fw-bold">Læge login</h3>
+                <div class="mb-3">
+                    <label for="email_label">E-mail</label>
+                    <input type="email_type" name="email_name" id="email_id" class="form-control" placeholder="Tast din e-mail ind">
+                </div>  
+                <div class="mb-3">
+                    <label for="password_label">Adgangskode</label>
+                    <input type="password_type" name="password_name" id="password_id" class="form-control" placeholder="Adgangskode">
+                </div>
+                <button type="submit" class="btn btn-primary" name="doctor_login" value="doctor_login">Login</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
