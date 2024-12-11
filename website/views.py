@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from datetime import datetime
 from . import db
 from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
+from .handles import handle_create_booking
 
 
 views = Blueprint('views', __name__)
@@ -18,13 +19,17 @@ def home():
 @views.route('/booking', methods = ['POST', 'GET'])
 @login_required
 def booking():
-    if session['user_type']:
-        user_type = session["user_type"]
-    else:
-        user_type = None
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    
+    result, booking = handle_create_booking(request.method, request.form)
 
-    if request.method != 'POST':
-        return render_template('booking.html', user=current_user, user_type=user_type)
+    if result == 'GET':
+        return render_template('booking.html', user=current_user)
+    
+    if result is not True:
+        flash(result, category='error')
+        return render_template('booking.html', user=current_user)
     
     user_id = session.get("user").split(':')[1]
     patient = Patient.query.get(user_id)

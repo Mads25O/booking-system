@@ -175,7 +175,9 @@ def handle_doctor_register(method, form_data):
         return True, new_doctor
 
 def handle_create_booking(method, form_data):
-    pass
+    if method != 'POST':
+        return 'GET', None
 
 def handle_edit_booking(method, form_data):
-    pass
+    if method != 'POST':
+        return 'GET', None
