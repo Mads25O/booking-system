@@ -5,6 +5,7 @@ from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
 from . import db
 import os
 import hashlib
+from datetime import datetime
 
 def generate_hash(unhashed_value, salt=None):
     if salt is None:
@@ -15,7 +16,7 @@ def check_cpr_exists(cpr_number):
     patients = PatientSpecificData.query.all()
     for patient in patients:
         hashed_cpr, _ = generate_hash(cpr_number, patient.cpr_salt)
-        if hashed_cpr == patient.hashed_cpr_number:
+        if hashed_cpr == patient.hashed_cpr:
             return True, patient
     return False, None
 
@@ -44,9 +45,10 @@ def handle_login(method, form_data):
 
         cpr_exists, patient = check_cpr_exists(cpr_number_form)
         if cpr_exists:
-            hashed_password, _ = generate_hash(password_form, patient.password_salt)
-            if hashed_password == patient.hashed_password:
-                return True, patient
+            user = User.query.filter_by(id=patient.user_id).first()
+            hashed_password, _ = generate_hash(password_form, user.password_salt)
+            if hashed_password == user.hashed_password:
+                return True, user
             else:
                 return 'Forkert kode', None
         else:
@@ -176,7 +178,33 @@ def handle_doctor_register(method, form_data):
 
 def handle_create_booking(method, form_data):
     if method != 'POST':
-        return 'GET', None
+        return 'GET'
+    
+    patient = User.query.get(current_user.id)
+
+    if not patient:
+        return 'Bruger ikke fundet', None
+
+    booking_date = request.form.get('date')
+    booking_time = request.form.get('time')
+
+    patient_id = PatientSpecificData.query.filter_by(user_id=current_user.id).first()
+
+    new_booking = Bookings(
+        user_id=current_user.id,
+        patient_id=patient_id,
+        date=booking_date,
+        time=booking_time,
+        created_at=datetime.now().isoformat()
+    )
+
+    try:
+        db.session.add(new_booking)
+        db.session.commit()
+    except Exception as e:
+        return f'Fejl {e}. Prøv igen'
+    
+    return True
 
 def handle_edit_booking(method, form_data):
     if method != 'POST':

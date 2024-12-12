@@ -22,7 +22,7 @@ def booking():
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
     
-    result, booking = handle_create_booking(request.method, request.form)
+    result = handle_create_booking(request.method, request.form)
 
     if result == 'GET':
         return render_template('booking.html', user=current_user)
@@ -31,36 +31,7 @@ def booking():
         flash(result, category='error')
         return render_template('booking.html', user=current_user)
     
-    user_id = session.get("user").split(':')[1]
-    patient = Patient.query.get(user_id)
-    bookings = Bookings.query.filter_by(user_id=user_id).all()
-
-    if not patient:
-        flash('Bruger ikke fundet', category='error')
-        return redirect(url_for('auth.login'))
-
-    booking_date = request.form.get('date')
-    booking_time = request.form.get('time')
-
-    new_booking = {
-        'user_id': user_id,
-        'date': booking_date,
-        'time': booking_time,
-        'created_at': datetime.now().isoformat()
-    }
-
-    bookings.bookings = bookings.bookings or []
-    bookings.bookings.append(new_booking)
-
-    try:
-        db.session.add(bookings)
-        db.session.commit()
-        flash('Booking oprettet!', category='success')
-    except Exception as e:
-        flash(f'Fejl {e}')
-    
-
-    return render_template('booking.html', user=current_user, user_type=user_type)
+    return redirect(url_for('views.home'))
 
 @views.route('/patient-bookings', methods=['POST','GET'])
 @login_required
@@ -95,7 +66,7 @@ def all_bookings():
 
 @views.route('/patient-bookings/<int:patient_id>')
 @login_required
-def patient_bookings(patient_id):
+def patient_bookings():
     if session['user_type']:
         user_type = session["user_type"]
     else:
