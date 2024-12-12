@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash
 from sqlalchemy.orm import joinedload
 from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
 from . import db
-from .functions import generate_hash, check_cpr_exists, check_user_exists, validate_password
+from .functions import generate_hash, check_cpr_exists, check_user_exists, validate_password, get_available_times
 import os
 import hashlib
 from datetime import datetime
@@ -154,7 +154,7 @@ def handle_create_booking(method, form_data):
     patient = User.query.get(current_user.id)
 
     if not patient:
-        return 'Bruger ikke fundet'
+        return 'Bruger ikke fundet', None
     
     booking_date = request.form.get('date')
     booking_time = request.form.get('time')
@@ -185,16 +185,16 @@ def handle_create_booking(method, form_data):
 def handle_all_bookings(method, form_data):
     if method == 'POST':
         patient_details = form_data.get('patient_booking')
-        return patient_details, None
+        return patient_details
 
     bookings = Bookings.query.join(Bookings.patient).order_by(Bookings.date, Bookings.time).all()
 
-    return True, bookings
+    return bookings
 
 def handle_patient_details(method, form_data, user):
     patient_id = user.id
     patient_bookings = Bookings.query.filter_by(user_id=patient_id).all()
-    patient_details = PatientSpecificData.query.filter_by(user_id=patient_id).all()
+    patient_details = PatientSpecificData.query.filter_by(user_id=patient_id).first()
 
     if method == 'POST':
         if form_data.get('patient-details-button'):
@@ -210,29 +210,22 @@ def handle_patient_details(method, form_data, user):
             if email and email.strip():
                 email_exists, _ = check_user_exists(email)
                 if email_exists:
-                    print('Email findes')
                     return 'Email er allerede i systemet.', patient_bookings, patient_details
                 else:
                     patient_details[0].email = email
-                    print(email)
-                    print(patient_details[0].email)
             
             if old_password and old_password.strip():
                 hashed_password, _ = generate_hash(old_password, user.password_salt)
                 if hashed_password == user.hashed_password:
-                    print(f"Hashed new password: {hashed_password}, Password salt: {user.password_salt}")
                     user.phone = phone
 
                 else:
-                    print('Forkert kode')
                     return 'Forkert kode', patient_bookings, patient_details
 
             if new_password and new_password.strip():
                 if len(new_password) < 10:
-                    print('Kode for kort')
                     return 'Adgangskoden er for kort', patient_bookings, patient_details
                 elif new_password != new_password_confirm:
-                    print('Kode stemmer ikke overens')
                     return 'Adgangskoden stemmer ikke overens', patient_bookings, patient_details   
                 else:
                     user.password = new_password
@@ -243,7 +236,6 @@ def handle_patient_details(method, form_data, user):
             try:
                 db.session.commit()
             except Exception as e:
-                print(f"Fejl under database commit: {e}")
                 return f'Fejl: {e}', patient_bookings, patient_details
         
         if form_data.get('delete_booking'):
@@ -253,6 +245,15 @@ def handle_patient_details(method, form_data, user):
             db.session.commit()
             patient_bookings = Bookings.query.filter_by(user_id=patient_id).all()
             flash('Booking slettet', category='success')
+
+        if form_data.get('dropdown-button'):
+            reference = form_data.get('dropdown-menu')
+
+            patient_details.reference = reference
+            db.session.commit()
+
+            
+                
                 
 
     return True, patient_bookings, patient_details

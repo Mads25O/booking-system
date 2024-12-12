@@ -25,6 +25,7 @@ class PatientSpecificData(db.Model):
     hashed_cpr = db.Column(db.String(64))
     cpr_salt = db.Column(db.String(32))
     email = db.Column(db.String(150), unique=True)
+    reference = db.Column(db.String(150))
     bookings = db.relationship('Bookings', back_populates='patient')
 
 class DoctorSpecificData(db.Model):

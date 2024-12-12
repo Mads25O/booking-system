@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-{% if user_type == 'patient' %}
+{% if user.role == 'patient' %}
 <h1>Velkommen til Hospital</h1>
-<h3>Du kan bestille tid til {{ user_message if user_message != None else 'ingenting' }}</h3>
+<h3>Du kan bestille tid til {{ reference if reference != None else 'ingenting' }}</h3>
 {% else %}
 
 {% endif %}

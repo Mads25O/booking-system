@@ -9,8 +9,8 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['POST', 'GET'])
 def login():
-    if current_user.is_authenticated:
-        return redirect('views.home')
+    # if current_user.is_authenticated:
+    #     return redirect('views.home')
 
     result, user = handle_login(request.method, request.form)
 

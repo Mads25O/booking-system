@@ -10,19 +10,16 @@ from .functions import get_available_times
 views = Blueprint('views', __name__)
 
 @views.route("/", methods=["POST", "GET"])
+@login_required
 def home():
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
+    reference = 1
 
-    return render_template('index.html', user=current_user)
+    return render_template('index.html', user=current_user, reference=reference)
 
 
 @views.route('/booking', methods = ['POST', 'GET'])
 @login_required
 def booking():
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
-    
     result = handle_create_booking(request.method, request.form)
 
     if result == 'GET':
@@ -36,6 +33,7 @@ def booking():
     return redirect(url_for('views.home'))
 
 @views.route('/update_available_times', methods=['GET'])
+@login_required
 def update_available_times():
     selected_date = request.args.get('date')
 
@@ -45,13 +43,16 @@ def update_available_times():
 @views.route('/patient-bookings', methods=['POST', 'GET'])
 @login_required
 def all_bookings():
-    result, grouped_bookings = handle_all_bookings(request.method, request.form)
+    grouped_bookings = handle_all_bookings(request.method, request.form)
+    print(grouped_bookings)
 
     return render_template('all-bookings.html', user=current_user, bookings=grouped_bookings)
 
 @views.route('/patient-detaljer/<int:patient_id>', methods=['POST', 'GET'])
 @login_required
 def patient_details(patient_id):
+
+
     patient = User.query.filter_by(id=patient_id).first()
     result, patient_bookings, patient_details = handle_patient_details(request.method, request.form, patient)
 

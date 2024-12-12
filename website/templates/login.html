@@ -2,7 +2,51 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="login-div text-center">
+<div class="login-div text-center" >
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-6 col-lg-4 me-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Patient Login</h2>
+                    <form method="POST" class="patient_login">
+                        <div class="mb-3">
+                            <label for="cpr_number">CPR-Nummer</label>
+                            <input type="cpr_number" name="cpr_number" id="cpr_number" class="form-control" placeholder="Tast dit CPR nummer ind">
+                        </div>  
+                        <div class="mb-3">
+                            <label for="password">Adgangskode</label>
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Adgangskode">
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="patient_login" value="patient_login">Login</button>
+                        <a class="nav-link mt-2" href="{{ url_for('auth.patient_register') }}">Opret bruger</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Læge Login</h2>
+                    <form method="POST" class="doctor_login">
+                        <div class="mb-3">
+                            <label for="email_label">Brugernavn</label>
+                            <input type="email_type" name="email_name" id="email_id" class="form-control" placeholder="Tast dit brugernavn ind">
+                        </div>  
+                        <div class="mb-3">
+                            <label for="password_label">Adgangskode</label>
+                            <input type="password_type" name="password_name" id="password_id" class="form-control" placeholder="Adgangskode">
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="doctor_login" value="doctor_login">Login</button>
+                        <a class="nav-link mt-2" href="{{ url_for('auth.doctor_register') }}">Opret bruger</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div class="login-div text-center">
     <div class="row justify-content-md-center">
         <div class="col col-lg-2">
             <form method="POST" class="patient_login">
@@ -33,5 +77,5 @@
             </form>
         </div>
     </div>
-</div>
+</div> -->
 {% endblock %}

@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
 }
 
 body {
@@ -9,7 +10,7 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
-  }
+}
 
 .styled-table {
   border-collapse: collapse;
@@ -21,7 +22,7 @@ body {
 }
 
 .styled-table thead tr {
-  background-color: #4CAF50; /* Grøn header */
+  background-color: #4b7ad3;
   color: white;
   text-align: center;
   font-weight: bold;
@@ -38,18 +39,18 @@ body {
 }
 
 .styled-table tbody tr:nth-of-type(even) {
-  background-color: #f3f3f3; /* Skiftende baggrundsfarve */
+  background-color: #f3f3f3; 
 }
 
-.styled-table tbody tr:hover {
-  background-color: #f1f1f1; /* Effekt ved hover */
+/* .styled-table tbody tr:hover {
+  background-color: #f1f1f1;
   cursor: pointer;
-}
+} */
 
 .styled-table td {
   text-align: center;
 }
 
 .styled-table tbody tr:last-of-type {
-  border-bottom: 2px solid #4CAF50; /* Ekstra skillelinje nederst */
+  border-bottom: 2px solid #4b7ad3;
 }
