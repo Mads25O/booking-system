@@ -1,0 +1,7 @@
+__pycache__/
+.12_env/
+.venv
+flask_session/
+website/__pycache__/
+instance/
+ideas

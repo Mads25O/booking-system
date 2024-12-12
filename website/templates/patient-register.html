@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<form method="POST">
+    <h3 class="fw-bold text-center">Lav en bruger</h3>
+    <div class="mb-3">
+        <label for="cpr_number_label">CPR-Nummer</label>
+        <input type="cpr_number_type" name="cpr_number_name" id="cpr_number_id" class="form-control" placeholder="Indtast dit CPR-nummer">
+    </div>
+    <div class="mb-3">
+        <label for="first_name_label">Fornavn</label>
+        <input type="first_name_type" name="first_name_name" id="first_name_id" class="form-control" placeholder="Indtast dit fornavn">
+    </div>
+    <div class="mb-3">
+        <label for="last_name_label">Efternavn</label>
+        <input type="last_name_type" name="last_name_name" id="last_name_id" class="form-control" placeholder="Indtast dit efternavn">
+    </div>
+    <div class="mb-3">
+        <label for="email_label">E-mail</label>
+        <input type="email_type" name="email_name" id="email_id" class="form-control" placeholder="Indtast din e-mail">
+    </div>
+    <div class="mb-3">
+        <label for="email_label_2">Bekræft e-mail</label>
+        <input type="email_type_2" name="email_name_confirm" id="email_id_2" class="form-control" placeholder="Bekræft din e-mail">
+    </div>
+    <div class="mb-3">
+        <label for="phone_label">Mobil</label>
+        <input type="phone_type" name="phone_name" id="phone_id" class="form-control" placeholder="Indtast dit mobil nummer">
+    </div>
+
+    <div class="mb-3">
+        <label for="password_label">Adgangskode</label>
+        <input type="password_type" name="password_name" id="password_id" class="form-control" placeholder="Indtast din adgangskode">
+    </div>
+    <div class="mb-3">
+        <label for="password_label_2">Bekræft adgangskode</label>
+        <input type="password_type_2" name="password_name_confirm" id="password_id_2" class="form-control" placeholder="Bekræft din adgangskode">
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+{% endblock %}

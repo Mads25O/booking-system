@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 align="center">{{ patient.first_name }} {{ patient.last_name }}</h1>
+<div class="patient-details-div">
+    <div class="patient-details">
+        <form method="POST" action="">
+            <h3 class="fw-bold text-center">Ændre dine oplysninger</h3>
+            <div class="mb-3">
+                <label for="email">E-mail</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="{{ patient_details[0].email }}">
+            </div>
+            <div class="mb-3">
+                <label for="phone">Mobil</label>
+                <input type="phone" name="phone" id="phone" class="form-control" placeholder="{{ patient.phone }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="old_password">Gamle adgangskode</label>
+                <input type="" name="old_password" id="old_password" class="form-control" placeholder="Indtast din gamle adgangskode">
+            </div>
+            <div class="mb-3">
+                <label for="new_password">Nye adgangskode</label>
+                <input type="" name="new_password" id="new_password " class="form-control" placeholder="Indtast din nye adgangskode">
+            </div>
+            <div class="mb-3">
+                <label for="new_password_confirm">Bekræft adgangskode</label>
+                <input type="" name="new_password_confirm" id="new_password_confirm " class="form-control" placeholder="Bekræft din nye adgangskode">
+            </div>
+            <br>
+            <button type="submit" name="patient-details-button" value="1" class="btn btn-primary">Gem</button>
+        </form>
+    </div>
+    <div class="patient-details-bookings">
+        <h2>Dine bookinger</h2>
+        <table class="styled-table" style="width: 40%;">
+            <thead>
+                <tr>
+                    <th>Dato</th>
+                    <th>Tid</th>
+                    <th>Slet</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in patient_bookings %}
+                <form method="post" action=" {{ url_for('views.patient_details', patient_id=booking.user.id) }} ">
+                    <tr>
+                        <td>{{ booking.date }}</td>
+                        <td>{{ booking.time }}</td>
+                        <td>
+                            <button type="submit" class="btn btn-primary" name="delete_booking" value="{{ booking.user.id }}">Slet</button>
+                        </td>
+                    </tr>
+                </form>
+                {% endfor %}
+                {% if patient_bookings|length == 0 %}
+                    <tr>
+                        <td colspan="3">Der er ingen bookinger at vise.</td>
+                    </tr>
+                {% endif %}
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
