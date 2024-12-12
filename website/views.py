@@ -4,6 +4,7 @@ from datetime import datetime
 from . import db
 from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
 from .handles import handle_create_booking, handle_all_bookings, handle_patient_details
+from .functions import get_available_times
 
 
 views = Blueprint('views', __name__)
@@ -34,6 +35,13 @@ def booking():
     flash('Booking lavet!', category='success')
     return redirect(url_for('views.home'))
 
+@views.route('/update_available_times', methods=['GET'])
+def update_available_times():
+    selected_date = request.args.get('date')
+
+    available_dates = get_available_times(selected_date)
+    return available_dates
+
 @views.route('/patient-bookings', methods=['POST', 'GET'])
 @login_required
 def all_bookings():
@@ -50,8 +58,6 @@ def patient_details(patient_id):
     if result is not True:
         flash(result, category='error')
 
-    
-    
 
     return render_template(
         'patient-details.html',

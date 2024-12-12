@@ -6,7 +6,7 @@ from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
 from . import db
 import os
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def generate_hash(unhashed_value, salt=None):
     if salt is None:
@@ -36,7 +36,7 @@ def check_user_exists(identity):
     
     return False, None
 
-def validate_password(password):
+def validate_password(password, confirm_password):
     if len(password) < 10:
         return "Adgangskoden skal være mindst 10 tegn lang."
     
@@ -56,3 +56,39 @@ def validate_password(password):
         return "Adgangskoden matcher ikke bekræftelsen."
     
     return True
+
+# def generate_time_slots(start, end, existing_bookings=None, interval_minutes=30):
+#     slots = []
+#     current_time = start
+#     while current_time <= end:
+        
+#         # slots.append(current_time.strftime('%H:%M'))
+#         # current_time += timedelta(minutes=interval_minutes)
+#         time_str = current_time.strftime('%H:%M')
+
+#         if existing_bookings and time_str not in existing_bookings:
+#             slots.append(time_str)
+#         elif not existing_bookings:
+#             slots.append(time_str)
+
+#         current_time += timedelta(minutes=interval_minutes)
+
+#     print(f"Existing bookings for date: {existing_bookings}")
+#     print(f"Generated slots: {slots}")
+#     # if not slots:
+#     #     return "Alt er booket"
+    
+#     return slots
+
+def get_available_times(date):
+    existing_bookings = Bookings.query.filter_by(date=date).all()
+    
+    all_times = [f"{hour:02d}:{minute:02d}" for hour in range(8, 17) for minute in [0, 30]]
+    booked_times = [booking.time for booking in existing_bookings]
+
+    available_times = [time for time in all_times if time not in booked_times]
+
+    if not available_times:
+        return "Alt er booket i dag", []
+    
+    return available_times

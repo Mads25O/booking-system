@@ -151,39 +151,40 @@ def handle_doctor_register(method, form_data):
         return True, new_doctor
 
 def handle_create_booking(method, form_data):
-    if method != 'POST':
-        return 'GET'
-    
     patient = User.query.get(current_user.id)
 
     if not patient:
-        return 'Bruger ikke fundet', None
-
+        return 'Bruger ikke fundet'
+    
     booking_date = request.form.get('date')
     booking_time = request.form.get('time')
 
     patient_id = PatientSpecificData.query.filter_by(user_id=current_user.id).first()
 
-    new_booking = Bookings(
-        user_id=current_user.id,
-        patient_id=patient_id.user_id,
-        date=booking_date,
-        time=booking_time,
-        created_at=datetime.now().isoformat()
-    )
+    if method == 'POST':
 
-    try:
-        db.session.add(new_booking)
-        db.session.commit()
-    except Exception as e:
-        return f'Fejl {e}. Prøv igen'
+        new_booking = Bookings(
+            user_id=current_user.id,
+            patient_id=patient_id.user_id,
+            date=booking_date,
+            time=booking_time,
+            created_at=datetime.now().isoformat()
+        )
+
+        try:
+            db.session.add(new_booking)
+            db.session.commit()
+        except Exception as e:
+            return f'Fejl {e}. Prøv igen'
+    
+    if method != 'POST':
+        return 'GET'
     
     return True
 
 def handle_all_bookings(method, form_data):
     if method == 'POST':
         patient_details = form_data.get('patient_booking')
-        print(f"Patient ID modtaget: {patient_details}")
         return patient_details, None
 
     bookings = Bookings.query.join(Bookings.patient).order_by(Bookings.date, Bookings.time).all()
@@ -244,6 +245,14 @@ def handle_patient_details(method, form_data, user):
             except Exception as e:
                 print(f"Fejl under database commit: {e}")
                 return f'Fejl: {e}', patient_bookings, patient_details
+        
+        if form_data.get('delete_booking'):
+            booking_id = form_data.get('delete_booking')
+            booking = Bookings.query.get(booking_id)
+            db.session.delete(booking)
+            db.session.commit()
+            patient_bookings = Bookings.query.filter_by(user_id=patient_id).all()
+            flash('Booking slettet', category='success')
                 
 
     return True, patient_bookings, patient_details
