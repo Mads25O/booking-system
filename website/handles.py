@@ -154,24 +154,30 @@ def handle_create_booking(method, form_data):
     patient = User.query.get(current_user.id)
 
     if not patient:
-        return 'Bruger ikke fundet', None
+        return 'Bruger ikke fundet'
     
     booking_date = request.form.get('date')
     booking_time = request.form.get('time')
 
-    patient_id = PatientSpecificData.query.filter_by(user_id=current_user.id).first()
+    patient = PatientSpecificData.query.filter_by(user_id=current_user.id).first()
+    reference = patient.reference
 
     if method == 'POST':
+        if reference == None:
+            return 'Du skal have en henvisning før du kan booke'
 
         new_booking = Bookings(
             user_id=current_user.id,
-            patient_id=patient_id.user_id,
+            patient_id=patient.user_id,
             date=booking_date,
+            reference=reference,
             time=booking_time,
+
             created_at=datetime.now().isoformat()
         )
 
         try:
+            patient.reference = None
             db.session.add(new_booking)
             db.session.commit()
         except Exception as e:
@@ -180,6 +186,7 @@ def handle_create_booking(method, form_data):
     if method != 'POST':
         return 'GET'
     
+    patient.reference = None
     return True
 
 def handle_all_bookings(method, form_data):

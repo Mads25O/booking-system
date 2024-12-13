@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 {% if user.role == 'patient' %}
-<h1>Velkommen til Hospital</h1>
-<h3>Du kan bestille tid til {{ reference if reference != None else 'ingenting' }}</h3>
+<h1>Velkommen til Hospitid</h1>
+{% if reference != None %}
+<h3>Du kan bestille tid til {{ reference }}</h3>
 {% else %}
-
+<h3>Du har ingen henvisning</h3>
+{% endif %}
+{% else %}
+<h1>Velkommen Læge</h1>
 {% endif %}
 {% endblock %}

@@ -1,5 +1,26 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<h1>Patienter</h1>
 
+<table class="styled-table">
+    <thead>
+        <tr>
+            <th>Navn</th>
+            <th>Detajler</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for patient in patients %}
+        <form method="post" action="{{ url_for('views.patient_details', patient_id=patient.id) }}">
+            <tr>
+                <td>{{ patient.first_name }} {{ patient.last_name }}</td>
+                <td>
+                    <button type="submit" class="button-custom" name="patient_id" value="{{ patient.id }}">Se patients profil</button>
+                </td>
+            </tr>
+        </form>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

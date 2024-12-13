@@ -12,7 +12,13 @@ views = Blueprint('views', __name__)
 @views.route("/", methods=["POST", "GET"])
 @login_required
 def home():
-    reference = 1
+    user_id = current_user.id
+    if current_user.role == 'patient':
+        patient_details = PatientSpecificData.query.filter_by(user_id=user_id).first()
+        reference = patient_details.reference
+        print(reference)
+    else:
+        reference = None
 
     return render_template('index.html', user=current_user, reference=reference)
 
@@ -66,3 +72,9 @@ def patient_details(patient_id):
         patient=patient, 
         patient_bookings=patient_bookings,
         patient_details=patient_details)
+
+@views.route('/alle-patienter', methods=['POST', 'GET'])
+@login_required
+def all_patients():
+    patients = User.query.filter_by(role='patient').all()
+    return render_template('all-patients.html', user=current_user, patients=patients)

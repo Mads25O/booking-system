@@ -39,6 +39,7 @@ class Bookings(db.Model):
     patient_id = db.Column(db.Integer, db.ForeignKey('patient_specific_data.id'))
     date = db.Column(db.String(100))
     time = db.Column(db.String(100))
+    reference = db.Column(db.String(150))
     created_at = db.Column(db.String(100))
 
     user = db.relationship('User', back_populates='bookings', foreign_keys=[user_id])
