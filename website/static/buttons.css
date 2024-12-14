@@ -1,5 +1,5 @@
 .button-custom {
-    background-color: #f8f9fa;
+    background-color: #e3e3e3;
     border: 1px solid #f8f9fa;
     border-radius: 4px;
     color: #3c4043;
@@ -40,7 +40,7 @@
   cursor: pointer;
   display: inline-flex;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 400;
   justify-content: center;
   line-height: 1.25;
   margin: 0;
@@ -64,7 +64,7 @@
 }
 
 .button-custom2:hover {
-  transform: translateY(-1px);
+  transform: translateY(-0.1px);
 }
 
 .button-custom2:active {
