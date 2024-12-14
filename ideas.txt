@@ -1,0 +1,25 @@
+Lav patient_details om til user_details så læger også kan bruge den
+I HTML siden, kan man så se om user role er patient eller læge, hvis det er læge skal der ikke vises bookinger og hvis det er patient, skal det vises.
+ARRRRG VAR
+
+/ DONE \ Læge skal kunne klikke ind på patienters profil og slette bookinger og lave en 'reference'
+
+/ DONE \ En 'reference' i databasen. Dette er en henvisning fra en læge. Hvis en patient har en reference, kan de bestille tid til dette.
+
+/ DONE \ Når en patient får booket tid med henvendelse, skal henvendelse slettes fra databasen, samt bookingen skal have henvendelse i sig
+
+Man kan bestille tid til alt. Du får en henvisning til radiology fx. og så kan du bestille tid til dette, med egen url (/booking/radiology). Hvor patienten har booket til, bliver også sat ind i databasen (reference bliver sat ind).
+DET OPPE OVER ER MÅSKE LIGEGYLDIGT DA DET NEDENUNDER MÅSKE ER BEDRE
+/ DONE \ Patienter kan kun booke når de har en henvisning. Der kommer fejl hvis de ikke har en.
+
+Hvis dette er en læge:
+patient_details = PatientSpecificData.query.filter_by(user_id=user_id).all()
+og der findes flere læger end patienter i systemet; fejler den så?
+
+Når man er læge og klikker på sit navn, kommer man ind på patient profil. FIX DET!!!
+
+/ DONE \ Lav all_patients for læger
+
+Lige nu kan alle gå ind i alles patient_details FIX DET!!!!
+
+AL data skal valideres når man opretter en bruger

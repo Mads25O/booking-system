@@ -1,4 +1,104 @@
 {% extends 'base.html' %}
 {% block content %}
+<div>
+    <h2>Alle patienters bookinger</h2>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Dato</th>
+                <th>Tid</th>
+                <th>Detaljer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <form method="post" action=" {{ url_for('views.patient_details', patient_id=booking.user.id) }} ">
+                <tr>
+                    <td>{{ booking.user.first_name }} {{ booking.user.last_name }} </td>
+                    <td>{{ booking.date }}</td>
+                    <td>{{ booking.time }}</td>
+                    <td>
+                        <button type="submit" class="button-custom" name="patient_booking" value="{{ booking.user.id }}">Se patients profil</button>
+                    </td>
+                </tr>
+            </form>
+            {% endfor %}
+            {% if bookings|length == 0 %}
+                <tr>
+                    <td colspan="3">Der er ingen bookinger at vise.</td>
+                </tr>
+            {% endif %}
+            
+        </tbody>
+    </table>
+</div>
 
+<div>
+    <h2>Alle patienters bookinger</h2>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Dato</th>
+                <th>Tid</th>
+                <th>Flere detaljer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <form method="post" action=" {{ url_for('views.patient_details', patient_id=booking.user.id) }} ">
+                <tr>
+                    <td>{{ booking.user.first_name }} {{ booking.user.last_name }} </td>
+                    <td>{{ booking.date }}</td>
+                    <td>{{ booking.time }}</td>
+                    <td>
+                        <button type="submit" class="button-custom2" name="patient_booking" value="{{ booking.user.id }}">Se patients bookings</button>
+                    </td>
+                </tr>
+            </form>
+            {% endfor %}
+            {% if bookings|length == 0 %}
+                <tr>
+                    <td colspan="3">Der er ingen bookinger at vise.</td>
+                </tr>
+            {% endif %}
+            
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h2>Alle patienters bookinger</h2>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Dato</th>
+                <th>Tid</th>
+                <th>Flere detaljer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <form method="post" action=" {{ url_for('views.patient_details', patient_id=booking.user.id) }} ">
+                <tr>
+                    <td>{{ booking.user.first_name }} {{ booking.user.last_name }} </td>
+                    <td>{{ booking.date }}</td>
+                    <td>{{ booking.time }}</td>
+                    <td>
+                        <button type="submit" class="button-custom4" name="patient_booking" value="{{ booking.user.id }}">Se patients bookings</button>
+                    </td>
+                </tr>
+            </form>
+            {% endfor %}
+            {% if bookings|length == 0 %}
+                <tr>
+                    <td colspan="3">Der er ingen bookinger at vise.</td>
+                </tr>
+            {% endif %}
+            
+        </tbody>
+    </table>
+</div>
 {% endblock %}
