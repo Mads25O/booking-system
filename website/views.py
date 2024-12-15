@@ -5,7 +5,8 @@ from . import db
 from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
 from .handles import handle_create_booking, handle_all_bookings, handle_patient_details
 from .functions import get_available_times
-
+import paho.mqtt.client as mqtt
+import jsonify
 
 views = Blueprint('views', __name__)
 
