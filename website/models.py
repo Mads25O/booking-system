@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     password_salt = db.Column(db.String(32))
     role = db.Column(db.String(10))
     phone = db.Column(db.Integer)
+    uid = db.Column(db.String(1000))
 
     bookings = db.relationship('Bookings', back_populates='user')
 

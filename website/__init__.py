@@ -22,7 +22,7 @@ def create_app():
     app.config['MQTT_BROKER_URL'] = '74.234.45.30'
     app.config['MQTT_BROKER_PORT'] = 1883
     app.config['MQTT_KEEPALIVE'] = 5
-    app.config['MQTT_TLS_ENABLED'] = False
+    # app.config['MQTT_TLS_ENABLED'] = True
 
     #MQTT Client
     mqtt_client = MQTTClient(app)
