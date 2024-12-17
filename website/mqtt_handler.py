@@ -4,6 +4,7 @@ from Crypto.Util.Padding import pad, unpad
 from Crypto.Util import Counter
 import binascii
 import base64
+import time
 
 class MQTTClient:
     def __init__(self, app):
@@ -19,7 +20,7 @@ class MQTTClient:
         @self.mqtt.on_connect()
         def handle_connect(client, userdata, flags, rc):
             print(f'on_connect client: {client}, userdata: {userdata}, flags: {flags}, rc: {rc}')
-            self.mqtt.subscribe(self.topic, qos=0)
+            self.mqtt.subscribe(self.topic, qos=1)
 
         @self.mqtt.on_message()
         def handle_mqtt_message(client, userdata, message):
@@ -34,6 +35,10 @@ class MQTTClient:
                 print('hell yeah')
                 print(len(data))
                 print(f"Received encrypted data: {binascii.hexlify(data)}")
+                if data in self.processed_messages:
+                    print('duplicateddddd')
+                    return None
+                self.processed_messages.add(data)
                 self.eval_data(data)
         
 
@@ -68,7 +73,7 @@ class MQTTClient:
 
     def eval_data(self, data):
         from .models import User
-        print('importet')
+        print('eval data starter')
 
         decrypted_data = self.decrypt_data(data)
         print(f'Decrypted_data: {decrypted_data}')
@@ -100,79 +105,4 @@ class MQTTClient:
             print(encrypted_response)
             self.mqtt.publish(self.topic, encrypted_response)
             print('der er ikke user')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            # with self.app.app_context():
-            #     from .models import User
-
-            #     encrypted_uid = data['payload']
-            #     decrypted_data = decrypt_data(encrypted_uid, self.key, self.iv)
-
-            #     user = User.query.filter_by(uid=encrypted_uid).first()
-
-            #     if user:
-            #         response_msg = f'Bruger med uid: {decrypted_data} fundet'
-            #     else:
-            #         response_msg = f'Bruger med uid: {decrypted_data} ikke fundet'
-                
-            #     encrypted_response = self.encrypt_data(f'RESPONSE {response_msg}')
-            #     self.encrypted_response = encrypted_response
-
-            #     self.mqtt.publish(self.topic, encrypted_response)
-            #     print(f'Sendte: {encrypted_response}')
-
-                # print(response_msg)
-                # # response_msg = response_msg.encode('utf-8')
-                # encrypted_response = self.encrypt_data(f'RESPONSE {response_msg}')
-                # if message.payload != encrypted_response:
-                #     self.already_responded = False
-                #     self.mqtt.publish(self.topic, encrypted_response)
-                #     print(f'Sent encrypted response: {encrypted_response}')
-                # else:
-                #     self.already_responded = True
-                # print(f'Sent encrypted response: {encrypted_response}')
-                
-                # encrypted_response = response_cipher.encrypt(padded_response)
-                # self.mqtt.publish(self.topic, encrypted_response)
-                # print(f'Sent encrypted response: {encrypted_response}')
-        
-                
-    # def encrypt_data(self, message):
-    #     cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
-    #     padded_message = message + " " * ((16 - len(message) % 16) % 16)
-    #     padded_message = padded_message.encode('utf-8')
-    #     return cipher.encrypt(padded_message)
-    # def encrypt_data(self, data):
-    #     if isinstance(data, str):
-    #         data = data.encode('utf-8')
-    #     cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
-    #     print(f'Type data: {type(data)}')
-    #     encrypted_msg = cipher.encrypt(pad(data, 16))
-    #     return encrypted_msg
-    
-
-
-
-# def decrypt_data(encrypted_data, key, iv):
-#     cipher = AES.new(key, AES.MODE_CBC, iv)
-#     decrypted = cipher.decrypt(encrypted_data)
-#     decrypted_data = decrypted.decode('utf-8').rstrip(' ')
-#     return decrypted_data
-
-
 
