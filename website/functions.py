@@ -7,6 +7,11 @@ from . import db
 import os
 import hashlib
 from datetime import datetime, timedelta
+from flask_mqtt import Mqtt
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from Crypto.Util import Counter
+import binascii
 
 def generate_hash(unhashed_value, salt=None):
     if salt is None:
@@ -92,3 +97,10 @@ def get_available_times(date):
         return "Alt er booket i dag", []
     
     return available_times
+
+def encrypt_data(data, key, iv):
+    if isinstance(data, str):
+        data = data.encode('utf-8')
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    encrypted_msg = cipher.encrypt(pad(data, 16))
+    return encrypted_msg

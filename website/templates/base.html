@@ -50,7 +50,7 @@
                   
                   
                 </ul>
-                
+                {% if user.role == 'patient' %}
                 <ul class="navbar-nav ms-auto">
                   <li class="nav-item">
                     <span class="navbar-text">
@@ -59,7 +59,7 @@
                     
                   </li>
                 </ul>
-                
+                {% endif %}
               </div>
             </div>
           </nav>

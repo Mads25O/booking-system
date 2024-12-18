@@ -3,9 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
 from flask_session import Session
+from .mqtt_handler import MQTTClient
 
 db = SQLAlchemy()
 DB_NAME = 'database.db'
+
 
 def create_app():
     app = Flask(__name__)
@@ -17,6 +19,13 @@ def create_app():
     app.config["SESSION_TYPE"] = "filesystem"
     Session(app)
 
+    app.config['MQTT_BROKER_URL'] = '74.234.45.30'
+    app.config['MQTT_BROKER_PORT'] = 1883
+    app.config['MQTT_KEEPALIVE'] = 5
+
+    #MQTT Client
+    mqtt_client = MQTTClient(app)
+
     from .views import views
     from .auth import auth
 
@@ -27,7 +36,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
-    
+
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
@@ -39,6 +48,7 @@ def create_app():
         try:
             user = User.query.get(int(user_id))
         except:
+            user_id = None
             user = None
         return user
 

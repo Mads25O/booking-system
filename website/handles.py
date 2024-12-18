@@ -4,10 +4,11 @@ from werkzeug.security import check_password_hash
 from sqlalchemy.orm import joinedload
 from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
 from . import db
-from .functions import generate_hash, check_cpr_exists, check_user_exists, validate_password, get_available_times
+from .functions import generate_hash, check_cpr_exists, check_user_exists, validate_password, get_available_times, encrypt_data
 import os
 import hashlib
 from datetime import datetime
+
 
 def handle_login(method, form_data):
     if method != 'POST':
@@ -202,6 +203,8 @@ def handle_patient_details(method, form_data, user):
     patient_id = user.id
     patient_bookings = Bookings.query.filter_by(user_id=patient_id).all()
     patient_details = PatientSpecificData.query.filter_by(user_id=patient_id).first()
+    key = b'\xb1\x84\xa6\xe8\x93Jk\xdb\xb5|\xf3{\xa4\x98\x07G#w!\x82\xe8\xb3c\x11$\xeb\x10\x15\xaa?W('
+    iv = b'\xc1\xd6\n\xd3v\xdae$\xb2\xbd\x17\x8e\xe1\xc4\x1e\xd9'
 
     if method == 'POST':
         if form_data.get('patient-details-button'):
@@ -212,6 +215,7 @@ def handle_patient_details(method, form_data, user):
             old_password = form_data.get('old_password')
             new_password = form_data.get('new_password')
             new_password_confirm = form_data.get('new_password_confirm')
+            uid = form_data.get('uid')
 
 
             if email and email.strip():
@@ -239,6 +243,10 @@ def handle_patient_details(method, form_data, user):
 
             if phone and phone.strip():
                 user.phone = phone
+
+            if uid and uid.strip():
+                uid = encrypt_data(uid, key, iv)
+                patient_details.uid = uid
 
             try:
                 db.session.commit()
