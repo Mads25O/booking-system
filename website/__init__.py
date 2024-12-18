@@ -36,7 +36,10 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        user = User.query.get(int(user_id))
+        try:
+            user = User.query.get(int(user_id))
+        except:
+            user = None
         return user
 
     return app
