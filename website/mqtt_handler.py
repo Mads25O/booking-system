@@ -36,11 +36,11 @@ class MQTTClient:
             print(f'Received message on topic: {data["topic"]} with payload: {data["payload"]}')
             data = data["payload"]
             with self.app.app_context():
-                print('hell yeah')
-                print(len(data))
+                # print('hell yeah')
+                # print(len(data))
                 print(f"Received encrypted data: {binascii.hexlify(data)}")
                 if data in self.processed_messages:
-                    print('duplicateddddd')
+                    # print('duplicateddddd')
                     return None
                 self.processed_messages.add(data)
                 self.eval_data(data)
@@ -67,22 +67,22 @@ class MQTTClient:
         try:
             cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
             decrypted = cipher.decrypt(encrypted_data)
-            print(f'Decrypted: {decrypted}')
+            # print(f'Decrypted: {decrypted}')
             decrypted_data = unpad(decrypted, AES.block_size)  # Fjern padding
             print(f'Decrypted_data: {decrypted_data}')
             return decrypted_data.decode('utf-8')
     
         except (ValueError, KeyError) as e:
-            print(f"Error during decryption or unpadding: {e}")
+            # print(f"Error during decryption or unpadding: {e}")
             return None
 
     def eval_data(self, data):
         from .models import User
-        print('eval data starter')
+        # print('eval data starter')
 
         decrypted_data = self.decrypt_data(data)
-        print(f'Decrypted_data: {decrypted_data}')
-        print(f'Decrypted_data type_: {type(decrypted_data)}')
+        # print(f'Decrypted_data: {decrypted_data}')
+        # print(f'Decrypted_data type_: {type(decrypted_data)}')
         try:
             split_decrypted_data = decrypted_data.split(':')
         except:
