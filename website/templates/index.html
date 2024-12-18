@@ -4,6 +4,7 @@
 <h1>Velkommen til Hospitid</h1>
 {% if reference != None %}
 <h3>Du kan bestille tid til {{ reference }}</h3>
+<a href="{{ url_for('views.booking') }}" class="btn btn-primary" role="button">Gå til booking</a>
 {% else %}
 <h3>Du har ingen henvisning</h3>
 {% endif %}
