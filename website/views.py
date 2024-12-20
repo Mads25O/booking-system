@@ -12,16 +12,14 @@ views = Blueprint('views', __name__)
 @views.route("/", methods=["POST", "GET"])
 @login_required
 def home():
-    user_id = current_user.id
+    # user_id = current_user.id
     if current_user.role == 'patient':
-        patient_details = PatientSpecificData.query.filter_by(user_id=user_id).first()
+        patient_details = PatientSpecificData.query.filter_by(user_id=current_user.id).first()
         reference = patient_details.reference
-        print(reference)
     else:
         reference = None
 
     return render_template('index.html', user=current_user, reference=reference)
-
 
 @views.route('/booking', methods = ['POST', 'GET'])
 @login_required
@@ -49,16 +47,20 @@ def update_available_times():
 @views.route('/patient-bookings', methods=['POST', 'GET'])
 @login_required
 def all_bookings():
+    if User.role != 'doctor':
+        flash('Denne side er kun for læger!', category='error')
+        return redirect(url_for('views.home'))
     grouped_bookings = handle_all_bookings(request.method, request.form)
-    print(grouped_bookings)
 
     return render_template('all-bookings.html', user=current_user, bookings=grouped_bookings)
 
 @views.route('/patient-detaljer/<int:patient_id>', methods=['POST', 'GET'])
 @login_required
 def patient_details(patient_id):
-
-
+    if patient_id != current_user.id and current_user.role != 'doctor':
+        flash(f'Du må ikke kigge på denne brugers oplysninger!', category='error')
+        return redirect(url_for('views.home'))
+    
     patient = User.query.filter_by(id=patient_id).first()
     result, patient_bookings, patient_details = handle_patient_details(request.method, request.form, patient)
 

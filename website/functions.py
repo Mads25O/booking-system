@@ -62,29 +62,6 @@ def validate_password(password, confirm_password):
     
     return True
 
-# def generate_time_slots(start, end, existing_bookings=None, interval_minutes=30):
-#     slots = []
-#     current_time = start
-#     while current_time <= end:
-        
-#         # slots.append(current_time.strftime('%H:%M'))
-#         # current_time += timedelta(minutes=interval_minutes)
-#         time_str = current_time.strftime('%H:%M')
-
-#         if existing_bookings and time_str not in existing_bookings:
-#             slots.append(time_str)
-#         elif not existing_bookings:
-#             slots.append(time_str)
-
-#         current_time += timedelta(minutes=interval_minutes)
-
-#     print(f"Existing bookings for date: {existing_bookings}")
-#     print(f"Generated slots: {slots}")
-#     # if not slots:
-#     #     return "Alt er booket"
-    
-#     return slots
-
 def get_available_times(date):
     existing_bookings = Bookings.query.filter_by(date=date).all()
     

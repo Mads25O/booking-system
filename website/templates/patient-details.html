@@ -49,7 +49,6 @@
                     <button type="submit" name="dropdown-button" value="1" class="btn btn-primary">Gem</button>
                 </form>
             </div>
-            <!-- <button type="submit" name="patient-details-button" value="1" class="btn btn-primary">Gem</button> -->
         </form>
         {% endif %}
     </div>
@@ -64,6 +63,7 @@
                 <tr>
                     <th>Dato</th>
                     <th>Tid</th>
+                    <th>Henvisning</th>
                     <th>Slet</th>
                 </tr>
             </thead>
@@ -73,6 +73,7 @@
                     <tr>
                         <td>{{ booking.date }}</td>
                         <td>{{ booking.time }}</td>
+                        <td>{{ booking.reference }}</td>
                         <td>
                             <button type="submit" class="btn btn-primary" name="delete_booking" value="{{ booking.id }}">Slet</button>
                         </td>
@@ -81,7 +82,7 @@
                 {% endfor %}
                 {% if patient_bookings|length == 0 %}
                     <tr>
-                        <td colspan="3">Der er ingen bookinger at vise.</td>
+                        <td colspan="4">Der er ingen bookinger at vise.</td>
                     </tr>
                 {% endif %}
                 

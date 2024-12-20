@@ -43,7 +43,6 @@ def handle_login(method, form_data):
         else:
             return 'E-mail er ikke i systemet', None
     
-
 def handle_patient_register(method, form_data):
     if method != 'POST':
         return 'GET', None
@@ -195,7 +194,7 @@ def handle_all_bookings(method, form_data):
         patient_details = form_data.get('patient_booking')
         return patient_details
 
-    bookings = Bookings.query.join(Bookings.patient).order_by(Bookings.date, Bookings.time).all()
+    bookings = Bookings.query.join(Bookings.patient).order_by(Bookings.date, Bookings.time, Bookings.reference).all()
 
     return bookings
 
@@ -256,6 +255,7 @@ def handle_patient_details(method, form_data, user):
         if form_data.get('delete_booking'):
             booking_id = form_data.get('delete_booking')
             booking = Bookings.query.get(booking_id)
+            patient_details.reference = booking.reference
             db.session.delete(booking)
             db.session.commit()
             patient_bookings = Bookings.query.filter_by(user_id=patient_id).all()

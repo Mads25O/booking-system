@@ -1,14 +1,23 @@
 {% extends 'base.html' %}
+
 {% block content %}
-{% if user.role == 'patient' %}
-<h1>Velkommen til Hospitid</h1>
-{% if reference != None %}
-<h3>Du kan bestille tid til {{ reference }}</h3>
-<a href="{{ url_for('views.booking') }}" class="btn btn-primary">Book en tid</a>
-{% else %}
-<h3>Du har ingen henvisning</h3>
-{% endif %}
-{% else %}
-<h1>Velkommen Læge</h1>
-{% endif %}
+<div class="container mt-5">
+    {% if user.role == 'patient' %}
+        <div class="text-center">
+            <img src="{{ url_for('static', filename='hospital.jpg') }}" class="img-fluid mb-4 rounded" alt="Hospital billede">
+            <h1 class="display-4">Velkommen til Hospitid</h1>
+            {% if reference != None %}
+                <h3 class="my-4">Du kan bestille tid til <span class="text-primary">{{ reference }}</span></h3>
+                <a href="{{ url_for('views.booking') }}" class="btn btn-success btn-lg">Book en tid</a>
+            {% else %}
+                <h3 class="my-4 text-warning">Du har ingen henvisning</h3>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="text-center">
+            <img src="{{ url_for('static', filename='hospital.jpg') }}" class="img-fluid mb-4 rounded" alt="Hospital billede">
+            <h1 class="display-4">Velkommen {{ user.first_name }}</h1>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

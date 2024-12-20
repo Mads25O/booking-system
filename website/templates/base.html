@@ -43,6 +43,9 @@
                     <li class="nav-item">
                       <a class="nav-link" href="{{ url_for('views.booking') }}">Booking</a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ url_for('views.patient_details', patient_id=current_user.id) }}">Oplysninger</a>
+                    </li>
                   {% endif %}
                   <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.logout') }}">Log ud</a>
@@ -74,9 +77,36 @@
             {% endfor %}
           {% endif %}
           {% endwith %}
-        
-        <div class="container">
-          {% block content %}{% endblock %}
+
+        <div class="d-flex flex-column min-vh-100">
+          <div class="container flex-grow-1">
+            {% block content %}{% endblock %}
+          </div>
         </div>
+        <footer class="footer mt-auto">
+            <div class="container p-4">
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                        <h5 class="text-uppercase">Hospitid</h5>
+                        <p>
+                            Vi tilbyder en nem og bekvem måde at booke tider hos læger og sundhedsprofessionelle.
+                        </p>
+                    </div>
+
+                    <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-end">
+                        <h5 class="text-uppercase">Kontakt</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-dark">Email: info@hospitid.com</a></li>
+                            <li><a href="#" class="text-dark">Telefon: +45 1234 5678</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center p-3 bg-dark text-white">
+                &copy; 2024 Hospitid. Alle rettigheder forbeholdes.
+            </div>
+        </footer>
+        
+
     </body>
 </html>

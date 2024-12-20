@@ -36,11 +36,8 @@ class MQTTClient:
             print(f'Received message on topic: {data["topic"]} with payload: {data["payload"]}')
             data = data["payload"]
             with self.app.app_context():
-                print('hell yeah')
-                print(len(data))
                 print(f"Received encrypted data: {binascii.hexlify(data)}")
                 if data in self.processed_messages:
-                    print('duplicateddddd')
                     return None
                 self.processed_messages.add(data)
                 self.eval_data(data)
@@ -67,9 +64,7 @@ class MQTTClient:
         try:
             cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
             decrypted = cipher.decrypt(encrypted_data)
-            print(f'Decrypted: {decrypted}')
             decrypted_data = unpad(decrypted, AES.block_size)  # Fjern padding
-            print(f'Decrypted_data: {decrypted_data}')
             return decrypted_data.decode('utf-8')
     
         except (ValueError, KeyError) as e:
@@ -78,39 +73,27 @@ class MQTTClient:
 
     def eval_data(self, data):
         from .models import PatientSpecificData
-        print('eval data starter')
 
         decrypted_data = self.decrypt_data(data)
-        print(f'Decrypted_data: {decrypted_data}')
-        print(f'Decrypted_data type_: {type(decrypted_data)}')
         try:
             split_decrypted_data = decrypted_data.split(':')
         except:
             return None
         
-        print(split_decrypted_data)
 
-        if split_decrypted_data[0] == 'ESP':
-            print('ESP')
-        else:
-            print('NOESP')
+        if split_decrypted_data[0] != 'ESP':
             return None
         
         uid_encrypted = self.encrypt_data(split_decrypted_data[1])
         user = PatientSpecificData.query.filter_by(uid=uid_encrypted).first()
 
-
-
         if user:
-            response_msg = 'FLASK:TRUE:TIME'.encode('utf-8')
+            current_time = time.time()
+            response_msg = f'FLASK:TRUE:{current_time}'.encode('utf-8')
             encrypted_response = self.encrypt_data(response_msg)
-            print(encrypted_response)
             self.mqtt.publish(self.topic, encrypted_response)
-            print('der er user')
         else:
-            response_msg = 'FLASK:FALSE:TIME'.encode('utf-8')
+            response_msg = f'FLASK:FALSE:{current_time}'.encode('utf-8')
             encrypted_response = self.encrypt_data(response_msg)
-            print(encrypted_response)
             self.mqtt.publish(self.topic, encrypted_response)
-            print('der er ikke user')
 
