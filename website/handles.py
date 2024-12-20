@@ -219,30 +219,6 @@ def handle_patient_details(method, form_data, user):
                 validated_password = validate_password(new_password, new_password_confirm)
                 if validated_password != True:
                     return validated_password, patient_bookings, patient_details
-
-            
-
-            
-            
-            # if old_password and old_password.strip():
-            #     hashed_password, _ = generate_hash(old_password, user.password_salt)
-
-            #     if hashed_password == user.hashed_password:
-
-            #         if new_password and new_password.strip():
-
-            #             validated_password = validate_password(new_password, new_password_confirm)
-                        
-            #             if validated_password != True:
-            #                 return validated_password, None
-            
-                
-            #             user.password = new_password
-            #         else:
-            #             return 'Ny adgangskode kan ikke være tom'
-            #     else:
-            #         return 'Forkert kode', patient_bookings, patient_details
-
             
 
             if phone and phone.strip():
@@ -265,6 +241,12 @@ def handle_patient_details(method, form_data, user):
             db.session.commit()
             patient_bookings = Bookings.query.filter_by(user_id=patient_id).all()
             flash('Booking slettet', category='success')
+        
+        if form_data.get('dropdown-button'):
+            reference = form_data.get('dropdown-menu')
+
+            patient_details.reference = reference
+            db.session.commit()
 
     return True, patient_bookings, patient_details
 
