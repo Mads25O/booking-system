@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 align="center">{{ user.first_name }} {{ user.last_name }}</h1>
+<div>
+    <div>
+        <form method="POST" action="">
+            <h3 class="fw-bold text-center">Ændre dine oplysninger</h3>
+            <div class="mb-3">
+                <label for="old_password">Gamle adgangskode</label>
+                <input type="password" name="old_password" id="old_password" class="form-control" placeholder="Indtast din gamle adgangskode">
+            </div>
+            <div class="mb-3">
+                <label for="new_password">Nye adgangskode</label>
+                <input type="password" name="new_password" id="new_password " class="form-control" placeholder="Indtast din nye adgangskode">
+            </div>
+            <div class="mb-3">
+                <label for="new_password_confirm">Bekræft adgangskode</label>
+                <input type="password" name="new_password_confirm" id="new_password_confirm " class="form-control" placeholder="Bekræft din nye adgangskode">
+            </div>
+            <div class="mb-3">
+                <label for="phone">Mobil</label>
+                <input type="phone" name="phone" id="phone" class="form-control" placeholder="{{ user.phone }}">
+            </div>
+            <div class="mb-3">
+                <label for="uid">Indtast din UID</label>
+                <input type="" name="uid" id="uid " class="form-control" placeholder="{{ user_uid }}">
+            </div>
+            <br>
+            <button type="submit" name="doctor-details-button" value="1" class="btn btn-primary">Gem</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

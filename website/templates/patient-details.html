@@ -17,19 +17,19 @@
 
             <div class="mb-3">
                 <label for="old_password">Gamle adgangskode</label>
-                <input type="" name="old_password" id="old_password" class="form-control" placeholder="Indtast din gamle adgangskode">
+                <input type="password" name="old_password" id="old_password" class="form-control" placeholder="Indtast din gamle adgangskode">
             </div>
             <div class="mb-3">
                 <label for="new_password">Nye adgangskode</label>
-                <input type="" name="new_password" id="new_password " class="form-control" placeholder="Indtast din nye adgangskode">
+                <input type="password" name="new_password" id="new_password " class="form-control" placeholder="Indtast din nye adgangskode">
             </div>
             <div class="mb-3">
                 <label for="new_password_confirm">Bekræft adgangskode</label>
-                <input type="" name="new_password_confirm" id="new_password_confirm " class="form-control" placeholder="Bekræft din nye adgangskode">
+                <input type="password" name="new_password_confirm" id="new_password_confirm " class="form-control" placeholder="Bekræft din nye adgangskode">
             </div>
             <div class="mb-3">
                 <label for="uid">Indtast din UID</label>
-                <input type="" name="uid" id="uid " class="form-control" placeholder="UID">
+                <input type="" name="uid" id="uid " class="form-control" placeholder="{{ user_uid }}">
             </div>
             <br>
             <button type="submit" name="patient-details-button" value="1" class="btn btn-primary">Gem</button>
@@ -73,7 +73,7 @@
                     <tr>
                         <td>{{ booking.date }}</td>
                         <td>{{ booking.time }}</td>
-                        <td>{{ booking.reference }}</td>
+                        <td>{{ booking.reference.capitalize() }}</td>
                         <td>
                             <button type="submit" class="btn btn-primary" name="delete_booking" value="{{ booking.id }}">Slet</button>
                         </td>

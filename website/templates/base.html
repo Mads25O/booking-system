@@ -63,6 +63,16 @@
                   </li>
                 </ul>
                 {% endif %}
+                {% if user.role == 'doctor' %}
+                <ul class="navbar-nav ms-auto">
+                  <li class="nav-item">
+                    <span class="navbar-text">
+                        Hej, <a class="navbar-text" style="text-decoration: none; color: inherit;" href="{{ url_for('views.doctor_details', doctor_id=current_user.id) }}">{{ user.first_name }}!</a>
+                    </span>
+                    
+                  </li>
+                </ul>
+                {% endif %}
               </div>
             </div>
           </nav>

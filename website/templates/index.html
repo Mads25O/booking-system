@@ -4,7 +4,7 @@
 <div class="container mt-5">
     {% if user.role == 'patient' %}
         <div class="text-center">
-            <img src="{{ url_for('static', filename='hospital.jpg') }}" class="img-fluid mb-4 rounded" alt="Hospital billede">
+            <img src="{{ url_for('static', filename='hospital.jpg') }}" class="img-fluid mb-4 rounded" alt="Hospital billede" style="max-width: 100vh;">
             <h1 class="display-4">Velkommen til Hospitid</h1>
             {% if reference != None %}
                 <h3 class="my-4">Du kan bestille tid til <span class="text-primary">{{ reference }}</span></h3>
@@ -15,7 +15,7 @@
         </div>
     {% else %}
         <div class="text-center">
-            <img src="{{ url_for('static', filename='hospital.jpg') }}" class="img-fluid mb-4 rounded" alt="Hospital billede">
+            <img src="{{ url_for('static', filename='hospital.jpg') }}" class="img-fluid mb-4 rounded" alt="Hospital billede" style="max-width: 100vh;">
             <h1 class="display-4">Velkommen {{ user.first_name }}</h1>
         </div>
     {% endif %}

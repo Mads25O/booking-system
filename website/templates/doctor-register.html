@@ -3,6 +3,9 @@
 {% block content %}
 <form method="POST">
     <h3 class="fw-bold text-center">Lav en læge bruger</h3>
+    <a href="{{ url_for('views.home') }}" class="btn btn-secondary mb-3">
+        <i class="bi bi-arrow-left"></i> Tilbage
+    </a>
     <div class="mb-3">
         <label for="first_name_label">Fornavn</label>
         <input type="first_name_type" name="first_name_name" id="first_name_id" class="form-control" placeholder="Indtast dit fornavn">
@@ -23,6 +26,13 @@
     <div class="mb-3">
         <label for="password_label">Adgangskode</label>
         <input type="password" name="password_name" id="password_id" class="form-control" placeholder="Indtast din adgangskode">
+        <ul class="mt-2">
+            <li>Adgangskoden skal være mindst 10 tegn lang.</li>
+            <li>Adgangskoden skal indeholde mindst ét stort bogstav.</li>
+            <li>Adgangskoden skal indeholde mindst ét lille bogstav.</li>
+            <li>Adgangskoden skal indeholde mindst ét specialtegn.</li>
+            <li>Indeholde mindst ét tal</li>
+        </ul>
     </div>
     <div class="mb-3">
         <label for="password_label_2">Bekræft adgangskode</label>

@@ -1,14 +1,9 @@
-from flask import Flask, Blueprint, render_template, request, redirect, url_for, session, flash
-from flask_login import login_user, login_required, logout_user, current_user
-from werkzeug.security import check_password_hash
-from sqlalchemy.orm import joinedload
+from flask import request, flash
+from flask_login import current_user
 from .models import User, PatientSpecificData, DoctorSpecificData, Bookings
 from . import db
-from .functions import generate_hash, check_cpr_exists, check_user_exists, validate_password, get_available_times, encrypt_data
-import os
-import hashlib
+from .functions import generate_hash, check_cpr_exists, check_user_exists, validate_password, encrypt_data
 from datetime import datetime
-
 
 def handle_login(method, form_data):
     if method != 'POST':
@@ -58,21 +53,16 @@ def handle_patient_register(method, form_data):
 
     cpr_exists, _ = check_cpr_exists(cpr_number_form)
     email_exists, _ = check_user_exists(email_form)
-
+    validated_password = validate_password(password_form, password_form_confirm)
+    
+    if validated_password != True:
+        return validated_password, None
     if cpr_exists:
         return 'CPR-nummeret er allerede i systemet', None
-    elif password_form != password_form_confirm:
-        return 'Adgangskoderne stemmer ikke overens', None
     elif email_form != email_form_confirm:
         return 'E-mail adressen stemmer ikke overens', None
     elif email_exists:
         return 'E-mail adressen er allerede i systemet', None
-    elif len(password_form) < 10:
-        return 'Adgangskoden er for kort', None
-    # elif password != speciale_tegn:
-    #   kode for nem
-    # elif password != ikke_stort_bogstav:
-    #   kode for nem
     else:
         hashed_cpr, cpr_salt = generate_hash(cpr_number_form)
         hashed_password, password_salt = generate_hash(password_form)
@@ -113,18 +103,12 @@ def handle_doctor_register(method, form_data):
     phone_form = form_data.get('phone_name')
 
     username_exists, _ = check_user_exists(username_form)
-    if username_exists:
-        return 'Brugernavn findes allerede', None
-    elif password_form != password_form_confirm:
-        return 'Adgangskoden stemmer ikke overens', None
-    elif len(password_form) < 10:
-        return 'Adgangskoden er for kort', None
-    
-    # elif password != speciale_tegn:
-    #   kode for nem
-    # elif password != ikke_stort_bogstav:
-    #   kode for nem
+    validated_password = validate_password(password_form, password_form_confirm)
 
+    if validated_password != True:
+        return validated_password, None
+    elif username_exists:
+        return 'Brugernavn findes allerede', None
     else:
         hashed_password, password_salt = generate_hash(password_form)
 
@@ -216,6 +200,13 @@ def handle_patient_details(method, form_data, user):
             new_password_confirm = form_data.get('new_password_confirm')
             uid = form_data.get('uid')
 
+            if not old_password or not old_password.strip():
+                return 'Den adgangskode er nødvendig for at ændre dine oplysninger.', patient_bookings, patient_details
+            
+            hashed_password, _ = generate_hash(old_password, user.password_salt)
+
+            if hashed_password != user.hashed_password:
+                return 'Forkert kode', patient_bookings, patient_details
 
             if email and email.strip():
                 email_exists, _ = check_user_exists(email)
@@ -223,29 +214,43 @@ def handle_patient_details(method, form_data, user):
                     return 'Email er allerede i systemet.', patient_bookings, patient_details
                 else:
                     patient_details[0].email = email
-            
-            if old_password and old_password.strip():
-                hashed_password, _ = generate_hash(old_password, user.password_salt)
-                if hashed_password == user.hashed_password:
-                    user.phone = phone
-
-                else:
-                    return 'Forkert kode', patient_bookings, patient_details
 
             if new_password and new_password.strip():
-                if len(new_password) < 10:
-                    return 'Adgangskoden er for kort', patient_bookings, patient_details
-                elif new_password != new_password_confirm:
-                    return 'Adgangskoden stemmer ikke overens', patient_bookings, patient_details   
-                else:
-                    user.password = new_password
+                validated_password = validate_password(new_password, new_password_confirm)
+                if validated_password != True:
+                    return validated_password, patient_bookings, patient_details
+
+            
+
+            
+            
+            # if old_password and old_password.strip():
+            #     hashed_password, _ = generate_hash(old_password, user.password_salt)
+
+            #     if hashed_password == user.hashed_password:
+
+            #         if new_password and new_password.strip():
+
+            #             validated_password = validate_password(new_password, new_password_confirm)
+                        
+            #             if validated_password != True:
+            #                 return validated_password, None
+            
+                
+            #             user.password = new_password
+            #         else:
+            #             return 'Ny adgangskode kan ikke være tom'
+            #     else:
+            #         return 'Forkert kode', patient_bookings, patient_details
+
+            
 
             if phone and phone.strip():
                 user.phone = phone
 
             if uid and uid.strip():
                 uid = encrypt_data(uid, key, iv)
-                patient_details.uid = uid
+                user.uid = uid
 
             try:
                 db.session.commit()
@@ -261,14 +266,41 @@ def handle_patient_details(method, form_data, user):
             patient_bookings = Bookings.query.filter_by(user_id=patient_id).all()
             flash('Booking slettet', category='success')
 
-        if form_data.get('dropdown-button'):
-            reference = form_data.get('dropdown-menu')
-
-            patient_details.reference = reference
-            db.session.commit()
-
-            
-                
-                
-
     return True, patient_bookings, patient_details
+
+def handle_doctor_details(method, form_data, user):
+    key = b'\xb1\x84\xa6\xe8\x93Jk\xdb\xb5|\xf3{\xa4\x98\x07G#w!\x82\xe8\xb3c\x11$\xeb\x10\x15\xaa?W('
+    iv = b'\xc1\xd6\n\xd3v\xdae$\xb2\xbd\x17\x8e\xe1\xc4\x1e\xd9'
+
+    if method != 'POST':
+        return 'GET'
+            
+    old_password = form_data.get('old_password')
+    new_password = form_data.get('new_password')
+    new_password_confirm = form_data.get('new_password_confirm')
+    uid = form_data.get('uid')
+
+
+    if not old_password or not old_password.strip():
+        return 'Den adgangskode er nødvendig for at ændre dine oplysninger.'
+
+    if new_password and new_password.strip():
+        validated_password = validate_password(new_password, new_password_confirm)
+        if validated_password != True:
+            return validated_password
+                
+        user.password = new_password
+
+
+    if uid and uid.strip():
+        uid = encrypt_data(uid, key, iv)
+        user.uid = uid
+        print(f"User UID: {user.uid}")
+
+        try:
+            db.session.commit()
+        except Exception as e:
+            return f'Fejl: {e}'
+        
+
+    return True

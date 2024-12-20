@@ -10,14 +10,9 @@ class User(db.Model, UserMixin):
     password_salt = db.Column(db.String(32))
     role = db.Column(db.String(10))
     phone = db.Column(db.Integer)
+    uid = db.Column(db.String(150))
 
     bookings = db.relationship('Bookings', back_populates='user')
-
-    def is_patient(self):
-        return self.role == 'patient'
-
-    def is_doctor(self):
-        return self.role == 'doctor'
 
 class PatientSpecificData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +21,6 @@ class PatientSpecificData(db.Model):
     cpr_salt = db.Column(db.String(32))
     email = db.Column(db.String(150), unique=True)
     reference = db.Column(db.String(150))
-    uid = db.Column(db.String(150))
     bookings = db.relationship('Bookings', back_populates='patient')
 
 class DoctorSpecificData(db.Model):
