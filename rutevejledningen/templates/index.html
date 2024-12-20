@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Map</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-antpath/1.0.0/leaflet-antpath.js"></script>
+
+
+</head>
+<body>
+    <h1>Hospital Map</h1>
+
+    <form method="POST">
+        <label for="target">Målpunkt:</label>
+        <select id="target" name="target" onchange="this.form.submit()">
+            <option value="Hus65a" {% if selected_building == 'Hus65a' %}selected{% endif %}>Hus65a</option>
+            <option value="Hus68" {% if selected_building == 'Hus68' %}selected{% endif %}>Hus68</option>
+        </select>
+    </form>
+    <div id="map" style="width: 100%; height: 600px;"></div>
+    <script>
+        var map = L.map('map').setView([54.778442742188595, 11.859601083623673], 17);
+
+        // Tilføj OpenStreetMap som tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Hent GeoJSON og opret AntPath
+        fetch("{{ url_for('georesources', filename='path_kirurgi.geojson') }}")
+            .then(response => response.json())
+            .then(data => {
+                // Extract koordinater fra GeoJSON og opret AntPath
+                var pathCoordinates = data.features[0].geometry.coordinates.map(coord => coord.reverse()); // Skift [lng, lat] til [lat, lng]
+
+                // Opret AntPath og tilføj det til kortet
+                L.polyline.antPath(pathCoordinates, {
+                    color: "blue",
+                    pulseColor: "red",
+                    delay: 300,
+                    weight: 5
+        }).addTo(map);
+            })
+
+            .catch(error => console.error('Fejl ved hentning af GeoJSON:', error));
+
+        // Funktion til at opdatere kortet
+        function updateMap(selectedBuilding) {
+            // Send AJAX-anmodning for at få de opdaterede GeoJSON-data
+            fetch('/update_map', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    selected_building: selectedBuilding
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Fjern tidligere lag fra kortet
+                map.eachLayer(function(layer) {
+                    if (layer instanceof L.GeoJSON || layer instanceof L.Polyline) {
+                        map.removeLayer(layer);
+                    }
+                });
+            
+                // Tilføj bygningens omrids
+                L.geoJSON(data.house_data).addTo(map);
+
+                // Tilføj AntPath for den valgte sti
+                L.polyline.antPath(data.path_data.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]), {
+                    color: "blue",
+                    pulseColor: "red",
+                    delay: 300,
+                    weight: 5
+                }).addTo(map);
+            })
+            .catch(error => console.error('Fejl ved indlæsning af GeoJSON:', error));
+        }
+
+        // Lyt efter ændring i dropdown-menuen
+        document.getElementById('target').addEventListener('change', function() {
+            var selectedBuilding = this.value;
+            updateMap(selectedBuilding);
+        });
+
+        // Initialiser kortet med standardbygning
+        updateMap('{{ selected_building }}');
+
+
+        
+    </script>
+</body>
+</html>
+   
