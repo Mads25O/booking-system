@@ -24,11 +24,14 @@ spi = SPI(2, baudrate=2500000, polarity=0, phase=0)
 spi.init()
 rdr = MFRC522(spi=spi, gpioRst=4, gpioCs=5)
 
-# WiFi login information
+buzzer_pin = Pin(27, Pin.OUT)
+PWM_buzzer = PWM(buzzer_pin, duty=0)
+
+# --- WiFi login ---
 WIFI_SSID = "Stofa64020"
 WIFI_PASSWORD = "ommer99vrede98"
 
-# MQTT Broker information
+# --- MQTT Broker ---
 MQTT_BROKER = "74.234.45.30"
 MQTT_PORT = 1883
 MQTT_TOPIC = "flask/mqtt/test"
@@ -52,7 +55,7 @@ def reset_display():
     lcd.putstr("Place your card...")
 
 
-# Opret forbindelse til WiFi
+# --- Opret forbindelse til WiFi ---
 def connect_wifi():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
@@ -79,12 +82,12 @@ def decrypt_data(data, key, iv):
     decipher = aes(key, MODE_CBC, iv)
     decrypted = decipher.decrypt(data)
         
-    pad_len = decrypted[-1]  # Sidste byte indeholder padding længden
+    pad_len = decrypted[-1]
     unpadded_data = decrypted[:-pad_len]
     
     return unpadded_data
 
-# MQTT Callback
+# --- MQTT Callback ---
 def mqtt_callback(topic, data):
     print(f"Received message on topic: {topic.decode('utf-8')} with payload: {data}")
     if data == last_sent_msg:
@@ -105,26 +108,46 @@ def mqtt_callback(topic, data):
             lcd.putstr("ACCESS GRANTED")
             lcd.move_to(0, 3)
             lcd.putstr(f"Welcome")
-            time.sleep(5)  # Tænd grøn LED i 5 sekunder
+            
+            PWM_buzzer.duty(712)
+            PWM_buzzer.freq(740)
+            sleep(0.1)
+            PWM_buzzer = PWM(buzzer_pin, duty=0)
+            sleep(0.1)
+            PWM_buzzer.duty(712)
+            PWM_buzzer.freq(740)
+            sleep(0.1)
+            PWM_buzzer = PWM(buzzer_pin, duty=0)
+            
+            time.sleep(5)
             grn.value(False)
-        if split_decrypted_data[1] == FALSE:
-            print('FALSE')
+            
+        if split_decrypted_data[1] == 'FALSE':
             lcd.move_to(0, 2)
             lcd.putstr("ACCESS DENIED!")
             lcd.move_to(0, 3)
             lcd.putstr("INVALID RFID")
             
-            
-            # Blink rød LED tre gange
             for _ in range(3):
                 red.value(False)
                 time.sleep(0.2)
                 red.value(True)
                 time.sleep(0.2)
+                
+            PWM_buzzer.duty(612)
+            PWM_buzzer.freq(640)
+            sleep(0.1)
+            PWM_buzzer = PWM(buzzer_pin, duty=0)
+            sleep(0.1)
+            PWM_buzzer.duty(612)
+            PWM_buzzer.freq(640)
+            sleep(0.1)
+            PWM_buzzer = PWM(buzzer_pin, duty=0)
+            
         else:
             return None
     except:
-        print('FEJL ARRG')
+        print('Fejl')
 
 def connect_mqtt():
     client = MQTTClient("ESP32", MQTT_BROKER, port=MQTT_PORT, user=USERNAME, password=PASSWORD)
@@ -138,16 +161,11 @@ def connect_mqtt():
         print(f"Failed to connect to MQTT broker: {e}")
     return client
 
-# Initialiser rød LED og display
 red.value(True)
-#reset_display()
+reset_display()
 
-# Kør forbindelsen
 connect_wifi()
-
-# Opret og forbind til MQTT
 mqtt_client = connect_mqtt()
-
 
 while True:
     (stat, tag_type) = rdr.request(rdr.REQIDL)
@@ -156,7 +174,6 @@ while True:
         if stat == rdr.OK:
             current_time = time.time()
             lcd.clear()
-            # Vis RFID UID
             lcd.move_to(0, 0)
             lcd.putstr("RFID Detected!")
             card_id = "0x%02x%02x%02x%02x" % (raw_uid[0], raw_uid[1], raw_uid[2], raw_uid[3])
@@ -165,11 +182,7 @@ while True:
             encrypted_uid = encrypt_uid(data_to_send, key, iv)
             print("UID:", card_id)
             lcd.move_to(0, 1)
-            lcd.putstr(f"UID: {card_id}")
-            
-            # Reset til standbytilstand
-
-            
+            lcd.putstr(f"UID: {card_id}") 
             try:
                 
                 sent_msgs.add(encrypted_uid)

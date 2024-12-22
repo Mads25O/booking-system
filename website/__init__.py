@@ -23,7 +23,6 @@ def create_app():
     app.config['MQTT_BROKER_PORT'] = 1883
     app.config['MQTT_KEEPALIVE'] = 5
 
-    #MQTT Client
     mqtt_client = MQTTClient(app)
 
     from .views import views

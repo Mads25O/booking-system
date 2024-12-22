@@ -36,7 +36,7 @@ def handle_login(method, form_data):
             else:
                 return 'Forkert kode', None
         else:
-            return 'E-mail er ikke i systemet', None
+            return 'Brugernavn er ikke i systemet', None
     
 def handle_patient_register(method, form_data):
     if method != 'POST':
